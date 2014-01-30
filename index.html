@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+	<link href='http://fonts.googleapis.com/css?family=Cookie' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+
+
+	<!--[if IE]>
+		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<!-- from : http://ghost-hack.com/post/jsexperiments/tunneler/tunneler.html -->
+</head>
+
+<body onload="init()">
+	<h1><span>Frontend</span> <br>Bubbles</h1>
+
+	<section class="white">
+		<div style="position:relative;top:250px;z-index:1;-moz-user-select: none;-khtml-user-select: none; user-select: none;">
+			<center> hold me </center>
+		</div>
+		<div style="z-index:4; position:absolute; top:0; left:0">
+			<canvas id="holdme" width="1225" height="892"></canvas>
+		</div>
+	</section>
+
+	<canvas id="canvas"></canvas>
+	<section></section>
+</body>
+
+<script>
+	var canvas = document.getElementById('canvas'),
+		ctx = canvas.getContext('2d'),
+		window_width = window.innerWidth,
+		window_height = window.innerHeight;
+
+		canvas.width = window_width;
+		canvas.height = window_height;
+
+		var $$ = {
+			randomInt : function(min, max) {
+				return Math.floor(Math.random() * (max - min +1) + min);
+			}
+		};
+
+		var particles =[];
+		var Particle = {
+			x: window_width /2,
+			y: window_height /2,
+			x_speed: 5,
+			y_speed: 5,
+			radius: 10,
+			_position: {},
+
+
+			draw: function(){
+				ctx.beginPath();
+				ctx.fillStyle = this.bg_color;
+				ctx.arc(this.x, this.y, this.radius, 0, Math.PI *2, false);
+				ctx.closePath();
+				ctx.fill();
+			},
+			trackPosition: function() {
+				var position = {x:this.x, y:this.y};
+				this._position.x = this.x;
+				this._position.y = this.y;
+			},
+			getPosition :function(){
+				return this._position;
+			}
+		};
+
+		function createParticle(){
+			var particle = Object.create(Particle);
+			particle.x_speed = $$.randomInt(-3, 3);
+			particle.y_speed = $$.randomInt(-3, 3);
+			particle.radius =  Math.floor(Math.random() * 25);
+			particles.push(particle);
+		}
+
+		function repaint() {
+			ctx.clearRect(0, 0, window_width, window_height);
+
+
+			for(var i = 0; i < particles.length; i++) {
+				var particle = particles[i];
+				particle.bg_color = "hsla(" + i + ", 20%, 65%, 0.3)";
+
+				if(particles.length > 1000) {
+					particles.shift();
+				}
+
+				particle.draw();
+
+				particle.x = particle.x + particle.x_speed;
+				particle.y = particle.y + particle.y_speed;
+
+				particle.trackPosition();
+			}
+		}
+
+		setInterval(function(){
+			createParticle();
+			repaint();
+
+
+
+		}, 1000/50);
+</script>
+<script type="text/javascript">
+	var g;
+	var canvas2;
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+	var windowHalfX = window.innerWidth / 2;
+	var windowHalfY = window.innerHeight / 2;
+	var mouseX = 0;
+	var mouseY = 0;
+	var pmouseX = 0;
+	var pmouseY = 0;
+	var mousePressed = false;
+	var drawRate = 6;
+	var frameCount = 0;
+	var PI = Math.PI;
+	var TWO_PI = 2 * Math.PI;
+	var HALF_PI = Math.PI * 0.5;
+
+	function init() {
+		canvas2 = document.getElementById('holdme');
+		canvas2.width = width;
+		canvas2.height = heigt;
+
+		g = canvas2.getContext('2d');
+		g.setTransform(1, 0, 0, 1, 0, 0);
+		document.addEventListener('mousemove', onDocumentMouseMove, false);
+		document.addEventListener('mousedown', onDocumentMouseDown, false);
+		document.addEventListener('mouseup', onDocumentMouseUp, false);
+		document.addEventListener('keydown', onDocumentKeyDown, false);
+		setup();
+		drawInternal();
+	}
+
+	function onDocumentMouseMove(event) {
+		mouseX = event.clientX - canvas2.offsetLeft;
+		mouseY = event.clientY - canvas2.offsetTop;
+	}
+
+	function onDocumentMouseDown(event) {
+		mousePressed = true;
+		mousePressedEvent();
+	}
+
+	function onDocumentMouseUp(event) {
+		mousePressed = false;
+	}
+
+	function onDocumentKeyDown(event) {
+		//setup();
+	}
+
+	function drawInternal() {
+		draw();
+		setTimeout('drawInternal()', drawRate);
+		pmouseX = mouseX;
+		pmouseY = mouseY;
+		frameCount++;
+	}
+
+	function clear() {
+		g.clearRect(0, 0, width, height);
+	}
+
+	function line(x1, y1, x2, y2) {
+		g.beginPath();
+		g.moveTo(x1, y1);
+		g.lineTo(x2, y2);
+		g.closePath();
+		g.stroke();
+	}
+
+	function fillStrokeCircle(x, y, radius) {
+		if(radius <= 0) radius = 0;
+		g.beginPath();
+		g.arc(x, y, radius, 0, TWO_PI, true);
+		g.closePath();
+		g.fill();
+		g.stroke();
+	}
+
+	function fillCircle(x, y, radius) {
+		if(radius <= 0) radius = 0;
+		g.beginPath();
+		g.arc(x, y, radius, 0, TWO_PI, true);
+		g.closePath();
+		g.fill();
+	}
+
+
+
+
+	
+</script>
+
+</html>
